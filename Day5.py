@@ -4,31 +4,22 @@ import time
 
 def parse_puzzle_input() -> list:
     puzzle_input = open("Day5.txt")
-    seeds = []
-    seed_maps = {}
+    seeds_part_one = []
+    seeds_part_two = []
     intervals = {}
 
     current_map_name = ""
     for row in puzzle_input:
         if row.startswith("seeds:"):
+            part_one_matches = list(map(int, re.findall(r"\d+", row)))
+            for number in part_one_matches:
+                seeds_part_one.append(number)
+
             matches = re.findall(r"(\d+ \d+)", row)
             for pair in matches:
                 seed_range_start, seed_range_length = list(map(int, re.findall(r"(\d+)", pair)))
                 for seed in range(seed_range_start, seed_range_start + seed_range_length):
-                    seeds.append(seed)
-            # print(matches)
-            # print(row)
-            # exit()
-            # row_stripped = row.split(":")[1].replace("\n", "").strip()
-            # numbers = row_stripped.split(" ")
-            # i = 0
-            # while i < len(numbers) - 1:
-            #     for seed in range(int(numbers[i]), int(numbers[i]) + int(numbers[i + 1])):
-            #         seeds.append(int(seed))
-            #     i += 2
-            # for number in numbers:
-            #     if number.strip().isnumeric():
-            #         seeds.append(int(number))
+                    seeds_part_two.append(seed)
         elif row == "" or row == "\n":
             current_map_name = ""
         elif row.replace(":", "").replace("-", "").replace(" ", "").strip().isalpha():
@@ -44,21 +35,8 @@ def parse_puzzle_input() -> list:
 
             intervals[current_map_name][range_destination] = [range_start, range_end]
 
-            # if current_map_name in seed_maps.keys():
-            #     seed_map = seed_maps[current_map_name]
-            # else:
-            #     seed_map = {}
-            #
-            # range_start = row_numbers[1]
-            # range_length = row_numbers[2]
-            #
-            # for value in range(range_start, range_start + range_length):
-            #     seed_map[value] = row_numbers[0] + (value - range_start)
-            #
-            # seed_maps[current_map_name] = seed_map
 
-
-    return [seeds, intervals]
+    return [seeds_part_one, seeds_part_two, intervals]
 
 def map_seed(seed, seed_maps):
     for destination, this_map in seed_maps.items():
@@ -80,16 +58,23 @@ def get_location_number(seed, seed_maps):
 
 def main():
     print("Parsing seeds. This is gonna take a minute")
-    [seeds, maps] = parse_puzzle_input()
-    print("Checking " + str(len(seeds)) + " seeds. This is gonna longer")
+    [seeds_part_one, seeds_part_two, maps] = parse_puzzle_input()
 
-    lowest_location_number = 999999999999999999999999
-    for seed in seeds:
+    print("Solving part one...")
+    lowest_location_number = 9999999999999999999999
+    for seed in seeds_part_one:
         location_number = get_location_number(seed, maps)
         if location_number <= lowest_location_number:
-            print("Found new lowest")
             lowest_location_number = location_number
-    print(lowest_location_number)
+    print("Part one solution: " + str(lowest_location_number))
+
+    print("Solving part two. This will take a LONG time...")
+    lowest_location_number = 999999999999999999999999
+    for seed in seeds_part_two:
+        location_number = get_location_number(seed, maps)
+        if location_number <= lowest_location_number:
+            lowest_location_number = location_number
+    print("Part two solution: " + str(lowest_location_number))
 
 if __name__ == "__main__":
     main()
